@@ -3,12 +3,14 @@ package org.soto.chavez.efren.model.secciones.enums;
 public enum AbmEnum {
     ALTA(1),
     BAJA(2),
-    MODIFICACION(3),
-    VISTA(4),
+    VISTA(3),
+    MODIFICACION(4),
     GUARDAR_ARCHIVO(5),
     LEER_ARCHIVO(6),
-    SALIR(7),
-    OPCION_ERRONEA(8);
+    GUARDAR_BD(7),
+    LEER_BD(8),
+    SALIR(9),
+    OPCION_ERRONEA(10);
 
     private Integer tipo;
 
@@ -32,7 +34,9 @@ public enum AbmEnum {
             case 4 -> MODIFICACION;
             case 5 -> GUARDAR_ARCHIVO;
             case 6 -> LEER_ARCHIVO;
-            case 7 -> SALIR;
+            case 7 -> GUARDAR_BD;
+            case 8 -> LEER_BD;
+            case 9 -> SALIR;
             default -> OPCION_ERRONEA;
         };
     }

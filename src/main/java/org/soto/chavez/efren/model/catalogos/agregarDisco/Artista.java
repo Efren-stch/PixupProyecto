@@ -1,19 +1,23 @@
-package org.soto.chavez.efren.model.agregarDisco;
+package org.soto.chavez.efren.model.catalogos.agregarDisco;
 import org.soto.chavez.efren.generalUtil.ManejoArchivos;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.model.ClaseCatalogo;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.ArtistaJdbcImpl;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.ColoniaJdbcImpl;
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
+import org.soto.chavez.efren.model.catalogos.registrarUsuario.Colonia;
+
 import java.util.ArrayList;
 
 public class Artista extends ClaseCatalogo {
     private static final long serialVersionUID = 1L;
-    private static Integer idIteracion = 1;
+    private static Integer idIteracion = 0;
     private static ArrayList<Artista> listArtista = new ArrayList<>();
     private static final ManejoArchivos<Artista> manejoArchivos = new ManejoArchivos<>(Artista.class);
 
     private static Artista manage;
     private Artista artistaEncontrado;
-    private Artista() {
+    public Artista() {
         super();
     }
     public static Artista getManage(){
@@ -23,8 +27,7 @@ public class Artista extends ClaseCatalogo {
         return manage;
     }
     public Artista(String nombre) {
-        super(idIteracion, nombre);
-        idIteracion++;
+        super(++idIteracion, nombre);
     }
     public static ArrayList<Artista> getListArtista() {
         if (listArtista == null) {
@@ -66,6 +69,18 @@ public class Artista extends ClaseCatalogo {
         manejoArchivos.guardarArchivo();
         System.out.println("Estados guardados en archivo.");
     }
+    @Override
+    public void leerBaseDatos() {
+        listArtista = ArtistaJdbcImpl.getInstance().findAll();
+    }
+    @Override
+    public void guardarBaseDatos() {
+        ArtistaJdbcImpl db = ArtistaJdbcImpl.getInstance();
+        for (Artista e : listArtista) {
+            db.guardar(e);
+        }
+    }
+
 
     @Override
     public String toString() {

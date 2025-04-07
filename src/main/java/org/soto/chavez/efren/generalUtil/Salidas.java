@@ -34,7 +34,9 @@ public class Salidas {
         "4. Actualizar\n" +
         "5. Guardar Archivo\n" +
         "6. Leer Archivo\n" +
-        "7. Salir"
+        "7. Guardar BD\n" +
+        "8. Leer BD\n" +
+        "9. Salir"
     );
     public static String leerId = "¿Cuál es el id?";
     public static String leerNombre = "¿Cuál es el nombre? ";

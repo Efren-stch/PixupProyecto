@@ -1,9 +1,11 @@
-package org.soto.chavez.efren.model.agregarDisco;
+package org.soto.chavez.efren.model.catalogos.agregarDisco;
 
 import org.soto.chavez.efren.generalUtil.ManejoArchivos;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.model.ClaseCatalogo;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.DisqueraJdbcImpl;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.GeneroMusicalJdbcImpl;
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 
 import java.util.ArrayList;
 
@@ -18,7 +20,7 @@ public class GeneroMusical extends ClaseCatalogo {
     private static GeneroMusical manage;
     private GeneroMusical generoMusicalEncontrado;
 
-    private GeneroMusical() {
+    public GeneroMusical() {
         super();
     }
     public static GeneroMusical getManage(){
@@ -29,9 +31,8 @@ public class GeneroMusical extends ClaseCatalogo {
     }
 
     public GeneroMusical(String nombre, String descripcion) {
-        super(idIteracion, nombre);
+        super(++idIteracion, nombre);
         this.descripcion = descripcion;
-        idIteracion++;
     }
 
     public static ArrayList<GeneroMusical> getListGeneroMusical() {
@@ -75,6 +76,18 @@ public class GeneroMusical extends ClaseCatalogo {
         manejoArchivos.setLista(new ArrayList<>(listGeneroMusical));
         manejoArchivos.guardarArchivo();
         System.out.println("Estados guardados en archivo.");
+    }
+
+    @Override
+    public void leerBaseDatos() {
+        listGeneroMusical = GeneroMusicalJdbcImpl.getInstance().findAll();
+    }
+    @Override
+    public void guardarBaseDatos() {
+        GeneroMusicalJdbcImpl db = GeneroMusicalJdbcImpl.getInstance();
+        for (GeneroMusical e : listGeneroMusical) {
+            db.guardar(e);
+        }
     }
 
     @Override

@@ -1,10 +1,11 @@
-package org.soto.chavez.efren.model.agregarDisco;
+package org.soto.chavez.efren.model.catalogos.agregarDisco;
 
 import org.soto.chavez.efren.generalUtil.ManejoArchivos;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.model.ClaseCatalogo;
-import org.soto.chavez.efren.model.registrarUsuario.Municipio;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.DiscoJdbcImpl;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.GeneroMusicalJdbcImpl;
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 
 import java.util.ArrayList;
 
@@ -27,7 +28,7 @@ public class Disco extends ClaseCatalogo {
     private static Disco manage;
     private Disco discoEncontrada;
 
-    private Disco() {
+    public Disco() {
         super();
     }
     public static Disco getManage(){
@@ -38,7 +39,7 @@ public class Disco extends ClaseCatalogo {
     }
 
     public Disco(String nombre, double precio, int existencia, double descuento, String fechaLanzamiento, String imagen, Disquera disquera, Artista artista, GeneroMusical generoMusical) {
-        super(idIteracion, nombre);
+        super(++idIteracion, nombre);
         this.precio = precio;
         this.existencia = existencia;
         this.descuento = descuento;
@@ -55,6 +56,56 @@ public class Disco extends ClaseCatalogo {
         }
         return listDisco;
     }
+
+    public double getPrecio() {
+        return precio;
+    }
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+    public int getExistencia() {
+        return existencia;
+    }
+    public void setExistencia(int existencia) {
+        this.existencia = existencia;
+    }
+    public double getDescuento() {
+        return descuento;
+    }
+    public void setDescuento(double descuento) {
+        this.descuento = descuento;
+    }
+    public String getFechaLanzamiento() {
+        return fechaLanzamiento;
+    }
+    public void setFechaLanzamiento(String fechaLanzamiento) {
+        this.fechaLanzamiento = fechaLanzamiento;
+    }
+    public String getImagen() {
+        return imagen;
+    }
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
+    }
+    public void setIdDisquera(int id){
+        this.disquera = (Disquera) buscarElemento(Disquera.getListDisquera(), id);
+    }
+    public int getIdDisquera(){
+        return Disquera.getListDisquera().indexOf(disquera);
+    }
+    public void setIdArtista(int id){
+        this.artista = (Artista) buscarElemento(Artista.getListArtista(), id);
+    }
+    public int getIdArtista(){
+        return Artista.getListArtista().indexOf(artista);
+    }
+    public void setIdGeneroMusical(int id){
+        this.generoMusical = (GeneroMusical) buscarElemento(GeneroMusical.getListGeneroMusical(), id);
+    }
+    public int getIdGeneroMusical(){
+        return GeneroMusical.getListGeneroMusical().indexOf(generoMusical) + 1;
+    }
+
 
     @Override
     public void alta() {
@@ -114,6 +165,17 @@ public class Disco extends ClaseCatalogo {
         manejoArchivos.setLista(new ArrayList<>(listDisco));
         manejoArchivos.guardarArchivo();
         System.out.println("Estados guardados en archivo.");
+    }
+    @Override
+    public void leerBaseDatos() {
+        listDisco = DiscoJdbcImpl.getInstance().findAll();
+    }
+    @Override
+    public void guardarBaseDatos() {
+        DiscoJdbcImpl db = DiscoJdbcImpl.getInstance();
+        for (Disco e : listDisco) {
+            db.guardar(e);
+        }
     }
 
     @Override

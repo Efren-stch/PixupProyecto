@@ -1,9 +1,11 @@
-package org.soto.chavez.efren.model.agregarDisco;
+package org.soto.chavez.efren.model.catalogos.agregarDisco;
 
 import org.soto.chavez.efren.generalUtil.ManejoArchivos;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.model.ClaseCatalogo;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.ArtistaJdbcImpl;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.DisqueraJdbcImpl;
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 
 import java.util.ArrayList;
 
@@ -15,7 +17,7 @@ public class Disquera extends ClaseCatalogo {
     private static Disquera manage;
     private Disquera disqueraEncontrada;
 
-    private Disquera() {
+    public Disquera() {
         super();
     }
     public static Disquera getManage(){
@@ -25,8 +27,7 @@ public class Disquera extends ClaseCatalogo {
         return manage;
     }
     public Disquera(String nombre) {
-        super(idIteracion, nombre);
-        idIteracion++;
+        super(++idIteracion, nombre);
     }
     public static ArrayList<Disquera> getListDisquera() {
         if (listDisquera == null) {
@@ -67,6 +68,17 @@ public class Disquera extends ClaseCatalogo {
         manejoArchivos.setLista(new ArrayList<>(listDisquera));
         manejoArchivos.guardarArchivo();
         System.out.println("Estados guardados en archivo.");
+    }
+    @Override
+    public void leerBaseDatos() {
+        listDisquera = DisqueraJdbcImpl.getInstance().findAll();
+    }
+    @Override
+    public void guardarBaseDatos() {
+        DisqueraJdbcImpl db = DisqueraJdbcImpl.getInstance();
+        for (Disquera e : listDisquera) {
+            db.guardar(e);
+        }
     }
 
     @Override

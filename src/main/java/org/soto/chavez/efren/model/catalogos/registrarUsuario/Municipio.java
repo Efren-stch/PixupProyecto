@@ -1,13 +1,15 @@
-package org.soto.chavez.efren.model.registrarUsuario;
+package org.soto.chavez.efren.model.catalogos.registrarUsuario;
 import org.soto.chavez.efren.generalUtil.ManejoArchivos;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.model.ClaseCatalogo;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.EstadoJdbcImpl;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.MunicipioJdbcImpl;
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 
 import java.util.ArrayList;
 public class Municipio extends ClaseCatalogo {
     private static final long serialVersionUID = 1L;
-    private static Integer idIteracion = 1;
+    private static Integer idIteracion = 0;
     private static ArrayList<Municipio> listMunicipios = new ArrayList<>();
     private static final ManejoArchivos<Municipio> manejoArchivos = new ManejoArchivos<>(Municipio.class);
 
@@ -15,8 +17,8 @@ public class Municipio extends ClaseCatalogo {
     private static Municipio manage;
     private Municipio municipioEncontrado;
 
-    private Municipio() {
-        super(0);
+    public Municipio() {
+        super();
     }
     public static Municipio getManage() {
         if (manage == null) {
@@ -25,9 +27,14 @@ public class Municipio extends ClaseCatalogo {
         return manage;
     }
     public Municipio(String nombre, Estado estado) {
-        super(idIteracion, nombre);
+        super(++idIteracion, nombre);
         this.estado = estado;
-        idIteracion++;
+    }
+    public void setIdEstado(int id){
+        this.estado = (Estado) buscarElemento(Estado.getListEstados(), id);
+    }
+    public int getIdEstado(){
+        return Estado.getListEstados().indexOf(estado) + 1;
     }
     public static ArrayList<Municipio> getListMunicipios() {
         if (listMunicipios == null) {
@@ -46,7 +53,7 @@ public class Municipio extends ClaseCatalogo {
         }
         String nombreAlta = ReadUtil.read(Salidas.leerNombre);
         System.out.println("Selecciona el id del estado al que pertenece: ");
-        listMunicipios.add(new Municipio(nombreAlta, (Estado) buscarElemento(Estado.getListEstados())));
+        listMunicipios.add(new Municipio(nombreAlta, (Estado) buscarElemento(Estado.getListEstados()))); //Cambiar para evitar el error si no encuentra el id
     }
     @Override
     public void baja() {
@@ -79,5 +86,17 @@ public class Municipio extends ClaseCatalogo {
                 ", id=" + id +
                 ", estado=" + estado.getNombre() +
                 '}';
+    }
+
+    @Override
+    public void leerBaseDatos() {
+        listMunicipios = MunicipioJdbcImpl.getInstance().findAll();
+    }
+    @Override
+    public void guardarBaseDatos() {
+        MunicipioJdbcImpl db = MunicipioJdbcImpl.getInstance();
+        for (Municipio e : listMunicipios) {
+            db.guardar(e);
+        }
     }
 }

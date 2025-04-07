@@ -1,16 +1,17 @@
-package org.soto.chavez.efren.model.agregarDisco;
+package org.soto.chavez.efren.model.catalogos.agregarDisco;
 
 import org.soto.chavez.efren.generalUtil.ManejoArchivos;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.model.ClaseCatalogo;
-import org.soto.chavez.efren.model.registrarUsuario.Municipio;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.CancionJdbcImpl;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.DiscoJdbcImpl;
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 
 import java.util.ArrayList;
 
 public class Cancion extends ClaseCatalogo {
     private static final long serialVersionUID = 1L;
-    private static Integer idIteracion = 1;
+    private static Integer idIteracion = 0;
     private static ArrayList<Cancion> listCancion = new ArrayList<>();
     private static final ManejoArchivos<Cancion> manejoArchivos = new ManejoArchivos<>(Cancion.class);
 
@@ -19,7 +20,7 @@ public class Cancion extends ClaseCatalogo {
     private static Cancion manage;
     private Cancion cancionEncontrada;
 
-    private Cancion() {
+    public Cancion() {
         super();
     }
     public static Cancion getManage(){
@@ -29,10 +30,22 @@ public class Cancion extends ClaseCatalogo {
         return manage;
     }
     public Cancion(String nombre, String duracion, Disco disco) {
-        super(idIteracion, nombre);
+        super(++idIteracion, nombre);
         this.duracion = duracion;
         this.disco = disco;
-        idIteracion++;
+    }
+
+    public String getDuracion() {
+        return duracion;
+    }
+    public void setDuracion(String duracion) {
+        this.duracion = duracion;
+    }
+    public void setIdDisco(int id){
+        this.disco = (Disco) buscarElemento(Disco.getListDisco(), id);
+    }
+    public int getIdDisco(){
+        return Disco.getListDisco().indexOf(disco) + 1;
     }
     public static ArrayList<Cancion> getListCancion() {
         if (listCancion == null) {
@@ -81,6 +94,17 @@ public class Cancion extends ClaseCatalogo {
         manejoArchivos.setLista(new ArrayList<>(listCancion));
         manejoArchivos.guardarArchivo();
         System.out.println("Estados guardados en archivo.");
+    }
+    @Override
+    public void leerBaseDatos() {
+        listCancion = CancionJdbcImpl.getInstance().findAll();
+    }
+    @Override
+    public void guardarBaseDatos() {
+        CancionJdbcImpl db = CancionJdbcImpl.getInstance();
+        for (Cancion e : listCancion) {
+            db.guardar(e);
+        }
     }
 
     @Override

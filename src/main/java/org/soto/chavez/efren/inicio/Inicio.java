@@ -3,25 +3,25 @@ package org.soto.chavez.efren.inicio;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
 import org.soto.chavez.efren.model.secciones.Ejecutable;
-import org.soto.chavez.efren.model.secciones.enums.TipoEjecutable;
+import org.soto.chavez.efren.model.secciones.enums.TipoEjecutableEnum;
 
 public class Inicio {
     public static void main(String args[]) {
         int opcion;
         Ejecutable ejecutable;
-        TipoEjecutable tipoEjecutable;
+        TipoEjecutableEnum tipoEjecutableEnum;
         while ( true ) {
             System.out.println(Salidas.menuPrincipal);
             opcion = ReadUtil.readInt(Salidas.seleccionarOpcion, 1, 3);
 
-            tipoEjecutable = TipoEjecutable.getTipoEjecutableById( opcion );
+            tipoEjecutableEnum = TipoEjecutableEnum.getTipoEjecutableById( opcion );
 
-            if ( TipoEjecutable.SALIR.equals(tipoEjecutable) ){
+            if ( TipoEjecutableEnum.SALIR.equals(tipoEjecutableEnum) ){
                 return;
-            } else if ( TipoEjecutable.OPCION_ERRONEA.equals(tipoEjecutable) ){
+            } else if ( TipoEjecutableEnum.OPCION_ERRONEA.equals(tipoEjecutableEnum) ){
                 Salidas.opcionInvalida();
-            } else if ( tipoEjecutable.getEjecutable() != null ){
-                ejecutable = tipoEjecutable.getEjecutable();
+            } else if ( tipoEjecutableEnum.getEjecutable() != null ){
+                ejecutable = tipoEjecutableEnum.getEjecutable();
                 ejecutable.run();
             }
         }

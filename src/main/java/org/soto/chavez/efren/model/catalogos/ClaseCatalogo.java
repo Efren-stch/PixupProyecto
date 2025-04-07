@@ -1,4 +1,4 @@
-package org.soto.chavez.efren.model;
+package org.soto.chavez.efren.model.catalogos;
 
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
@@ -14,12 +14,9 @@ public abstract class ClaseCatalogo implements Serializable {
 
     protected ClaseCatalogo() {
     }
-    public ClaseCatalogo(Integer id) {
-        this.id = id;
-    }
     protected ClaseCatalogo(Integer id, String nombre) {
-        this.id = id;
         this.nombre = nombre;
+        this.id = id;
     }
 
     public Integer getId() {
@@ -64,10 +61,27 @@ public abstract class ClaseCatalogo implements Serializable {
         }
     }
 
+    public ClaseCatalogo buscarElemento(ArrayList<? extends ClaseCatalogo> list, int idBusqueda) {
+        if (list == null || list.isEmpty()) {
+            System.out.println("No existen registros aún");
+            return null;
+        } else {
+            for (ClaseCatalogo elemento : list) {
+                if (elemento.getId().equals(idBusqueda)) {
+                    return elemento;
+                }
+            }
+            System.out.println("El registro no fue encontrado");
+            return null;
+        }
+    }
+
     public abstract void alta();
     public abstract void baja();
     public abstract void modificacion();
     public abstract void vista();
     public abstract void leerArchivo();
     public abstract void guardarArchivo();
+    public abstract void leerBaseDatos();
+    public abstract void guardarBaseDatos();
 }

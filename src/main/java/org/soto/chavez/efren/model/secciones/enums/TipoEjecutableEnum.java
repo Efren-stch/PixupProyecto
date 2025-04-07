@@ -4,7 +4,7 @@ import org.soto.chavez.efren.model.secciones.Ejecutable;
 import org.soto.chavez.efren.model.secciones.vista.consola.Consola;
 import org.soto.chavez.efren.model.secciones.vista.ventana.Ventana;
 
-public enum TipoEjecutable {
+public enum TipoEjecutableEnum {
     CONSOLA( 1, Consola.getInstance() ),
     VENTANA( 2, Ventana.getInstance() ),
     SALIR( 3, null ),
@@ -13,7 +13,7 @@ public enum TipoEjecutable {
     private Integer id;
     private Ejecutable ejecutable;
 
-    TipoEjecutable(Integer id, Ejecutable ejecutable) {
+    TipoEjecutableEnum(Integer id, Ejecutable ejecutable) {
         this.id = id;
         this.ejecutable = ejecutable;
     }
@@ -34,7 +34,7 @@ public enum TipoEjecutable {
         this.ejecutable = ejecutable;
     }
 
-    public static TipoEjecutable getTipoEjecutableById ( Integer opcion ) {
+    public static TipoEjecutableEnum getTipoEjecutableById (Integer opcion ) {
         switch (opcion) {
             case 1:
                 return CONSOLA;

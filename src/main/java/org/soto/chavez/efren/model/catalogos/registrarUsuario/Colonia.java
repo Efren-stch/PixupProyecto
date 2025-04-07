@@ -1,13 +1,15 @@
-package org.soto.chavez.efren.model.registrarUsuario;
+package org.soto.chavez.efren.model.catalogos.registrarUsuario;
 import org.soto.chavez.efren.generalUtil.ManejoArchivos;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.model.ClaseCatalogo;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.ColoniaJdbcImpl;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.MunicipioJdbcImpl;
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 
 import java.util.ArrayList;
 public class Colonia extends ClaseCatalogo {
     private static final long serialVersionUID = 1L;
-    private static Integer idIteracion = 1;
+    private static Integer idIteracion = 0;
     private static ArrayList<Colonia> listColonia;
     private static final ManejoArchivos<Colonia> manejoArchivos = new ManejoArchivos<>(Colonia.class);
 
@@ -16,8 +18,8 @@ public class Colonia extends ClaseCatalogo {
     private static Colonia manage;
     private Colonia coloniaEncontrada;
 
-    private Colonia() {
-        super(0);
+    public Colonia() {
+        super();
     }
     public static Colonia getManage(){
         if (manage == null){
@@ -26,11 +28,9 @@ public class Colonia extends ClaseCatalogo {
         return manage;
     }
     private Colonia(String nombre, Municipio municipio, Integer cp) {
-        super(idIteracion, nombre);
+        super(idIteracion++, nombre);
         this.municipio = municipio;
         this.cp = cp;
-
-        idIteracion++;
     }
     public Integer getCp() {
         return cp;
@@ -38,6 +38,13 @@ public class Colonia extends ClaseCatalogo {
     public void setCp(Integer cp) {
         this.cp = cp;
     }
+    public void setIdMunicipio(int id){
+        this.municipio = (Municipio) buscarElemento(Municipio.getListMunicipios(), id);
+    }
+    public int getIdMunicipio(){
+        return Municipio.getListMunicipios().indexOf(municipio) + 1;
+    }
+
     @Override
     public void alta() {
         if(Municipio.getListMunicipios().isEmpty()){
@@ -83,6 +90,18 @@ public class Colonia extends ClaseCatalogo {
         System.out.println("Estados guardados en archivo.");
     }
     @Override
+    public void leerBaseDatos() {
+        listColonia = ColoniaJdbcImpl.getInstance().findAll();
+    }
+    @Override
+    public void guardarBaseDatos() {
+        ColoniaJdbcImpl db = ColoniaJdbcImpl.getInstance();
+        for (Colonia e : listColonia) {
+            db.guardar(e);
+        }
+    }
+
+    @Override
     public String toString() {
         return "Colonia {" +
                 "nombre ='" + nombre + '\'' +
@@ -91,4 +110,6 @@ public class Colonia extends ClaseCatalogo {
                 ", municipio =" + municipio.getNombre() +
                 '}';
     }
+
+
 }

@@ -1,21 +1,22 @@
-package org.soto.chavez.efren.model.registrarUsuario;
+package org.soto.chavez.efren.model.catalogos.registrarUsuario;
 import org.soto.chavez.efren.generalUtil.ManejoArchivos;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.model.ClaseCatalogo;
+import org.soto.chavez.efren.generalUtil.sql.implementacion.EstadoJdbcImpl;
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 
 import java.util.ArrayList;
 public class Estado extends ClaseCatalogo {
+    private static Integer idIteracion = 0;
     private static final long serialVersionUID = 1L;
-    private static Integer idIteracion = 1;
     private static ArrayList<Estado> listEstados = new ArrayList<>();
     private static ManejoArchivos<Estado> manejoArchivos = new ManejoArchivos<>(Estado.class);
 
     private static Estado manage;
     private Estado estadoEncontrado;
 
-    private Estado() {
-        super(0);
+    public Estado() {
+        super();
     }
     public static Estado getManage(){
         if (manage == null){
@@ -24,8 +25,7 @@ public class Estado extends ClaseCatalogo {
         return manage;
     }
     public Estado(String nombre) {
-        super(idIteracion, nombre);
-        idIteracion++;
+        super(++idIteracion, nombre);
     }
     public static ArrayList<Estado> getListEstados() {
         if (listEstados == null) {
@@ -33,13 +33,10 @@ public class Estado extends ClaseCatalogo {
         }
         return listEstados;
     }
+
     @Override
     public void alta() {
-        if (listEstados == null){
-            listEstados = new ArrayList<>();
-        }
         String nombreAlta = ReadUtil.read(Salidas.leerNombre);
-
         listEstados.add(new Estado(nombreAlta));
     }
     @Override
@@ -53,7 +50,7 @@ public class Estado extends ClaseCatalogo {
     }
     @Override
     public void vista(){
-        mostrarVista(listEstados);
+        if(listEstados != null) mostrarVista(listEstados);
     }
     @Override
     public void leerArchivo() {
@@ -73,5 +70,17 @@ public class Estado extends ClaseCatalogo {
                 "nombre='" + nombre + '\'' +
                 ", id=" + id +
                 '}';
+    }
+
+    @Override
+    public void leerBaseDatos() {
+        listEstados = EstadoJdbcImpl.getInstance().findAll();
+    }
+    @Override
+    public void guardarBaseDatos() {
+        EstadoJdbcImpl db = EstadoJdbcImpl.getInstance();
+        for (Estado e : listEstados) {
+            db.guardar(e);
+        }
     }
 }

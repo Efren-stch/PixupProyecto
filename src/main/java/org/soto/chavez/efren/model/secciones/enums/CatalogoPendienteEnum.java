@@ -1,9 +1,9 @@
 package org.soto.chavez.efren.model.secciones.enums;
 
 import org.soto.chavez.efren.model.secciones.Ejecutable;
-import org.soto.chavez.efren.model.secciones.seccion_catalogo_pendiente.catalogos.SeccionCatalogos;
+import org.soto.chavez.efren.model.secciones.vista.consola.seccion_catalogo_pendiente.catalogos.SeccionCatalogos;
 
-public enum TipoEjecutableCatalogoPendiente {
+public enum CatalogoPendienteEnum {
     CATALOGO(1, SeccionCatalogos.getInstance()),
     PENDIENTE(2, null),
     SALIR(3, null),
@@ -12,7 +12,7 @@ public enum TipoEjecutableCatalogoPendiente {
     private Integer id;
     private Ejecutable ejecutable;
 
-    TipoEjecutableCatalogoPendiente(Integer id, Ejecutable ejecutable) {
+    CatalogoPendienteEnum(Integer id, Ejecutable ejecutable) {
         this.id = id;
         this.ejecutable = ejecutable;
     }
@@ -33,7 +33,7 @@ public enum TipoEjecutableCatalogoPendiente {
         this.ejecutable = ejecutable;
     }
 
-    public static TipoEjecutableCatalogoPendiente getTipoEjecutableById(Integer opcion) {
+    public static CatalogoPendienteEnum getTipoEjecutableById(Integer opcion) {
         return switch (opcion) {
             case 1 -> CATALOGO;
             case 2 -> PENDIENTE;

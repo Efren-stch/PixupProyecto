@@ -3,7 +3,7 @@ package org.soto.chavez.efren.model.secciones.vista.consola;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
 import org.soto.chavez.efren.model.secciones.Ejecutable;
-import org.soto.chavez.efren.model.secciones.enums.TipoEjecutableCatalogoPendiente;
+import org.soto.chavez.efren.model.secciones.enums.CatalogoPendienteEnum;
 
 public class Consola implements Ejecutable {
     private static Consola consola;
@@ -20,16 +20,16 @@ public class Consola implements Ejecutable {
     public void run() {
         int opcion;
         Ejecutable ejecutable;
-        TipoEjecutableCatalogoPendiente tipoEjecutable;
+        CatalogoPendienteEnum tipoEjecutable;
         while (true) {
             System.out.println(Salidas.menuSeccion2);
             opcion = ReadUtil.readInt(Salidas.seleccionarOpcion, 1, 3);
 
-            tipoEjecutable = TipoEjecutableCatalogoPendiente.getTipoEjecutableById( opcion );
+            tipoEjecutable = CatalogoPendienteEnum.getTipoEjecutableById( opcion );
 
-            if ( TipoEjecutableCatalogoPendiente.SALIR.equals(tipoEjecutable) ){
+            if ( CatalogoPendienteEnum.SALIR.equals(tipoEjecutable) ){
                 return;
-            } else if ( TipoEjecutableCatalogoPendiente.OPCION_ERRONEA.equals(tipoEjecutable) ){
+            } else if ( CatalogoPendienteEnum.OPCION_ERRONEA.equals(tipoEjecutable) ){
                 Salidas.opcionInvalida();
             } else if ( tipoEjecutable.getEjecutable() != null ){
                 ejecutable = tipoEjecutable.getEjecutable();
