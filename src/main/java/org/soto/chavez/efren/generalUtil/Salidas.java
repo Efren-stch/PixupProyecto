@@ -32,11 +32,13 @@ public class Salidas {
         "2. Baja\n" +
         "3. Ver\n" +
         "4. Actualizar\n" +
+        /*
         "5. Guardar Archivo\n" +
         "6. Leer Archivo\n" +
         "7. Guardar BD\n" +
         "8. Leer BD\n" +
-        "9. Salir"
+         */
+        "5. Salir"
     );
     public static String leerId = "¿Cuál es el id?";
     public static String leerNombre = "¿Cuál es el nombre? ";
@@ -44,18 +46,17 @@ public class Salidas {
 
     public static String nuevoNombre = "¿Cuál es el nuevo nombre?";
 
-
     public static String seleccionarOpcion = "Selecciona una opción: ";
 
     public static String listaVacia = "No hay estados registrados";
     public static String elementoNoEncontrado = "No se encontró el elemento";
+
     public static void opcionInvalida() {
         System.out.println("La opción no es correcta");
     }
     public static void errorDato() {
         System.out.println("No es un dato valido");
     }
-
     public static void terminarPrograma(){
         System.out.println("¡Hasta luego!");
         System.out.println("No olvides cerrar la ventana si aún sigue abierta");

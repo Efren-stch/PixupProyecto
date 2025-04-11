@@ -1,7 +1,9 @@
 package org.soto.chavez.efren.generalUtil.sql.implementacion;
 
 
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 import org.soto.chavez.efren.model.catalogos.agregarDisco.Disco;
+import org.soto.chavez.efren.model.catalogos.agregarDisco.GeneroMusical;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,9 +40,14 @@ public class DiscoJdbcImpl extends CatalogoJdbcImpl<Disco> {
                 Disco d = new Disco();
                 d.setId(rs.getInt("id"));
                 d.setNombre(rs.getString("nombre"));
-                d.setIdArtista(rs.getInt("idArtista"));
-                d.setIdDisquera(rs.getInt("idDisquera"));
-                d.setIdGeneroMusical(rs.getInt("idGeneroMusical"));
+                d.setPrecio(rs.getDouble("precio"));
+                d.setExistencia(rs.getInt("existencia"));
+                d.setDescuento(rs.getDouble("descuento"));
+                d.setFechaLanzamiento(rs.getString("fechaLanzamiento"));
+                d.setImagen(rs.getString("imagen"));
+                d.setArtista(rs.getInt("idArtista"));
+                d.setDisquera(rs.getInt("idDisquera"));
+                d.setGeneroMusical(rs.getInt("idGeneroMusical"));
                 list.add(d);
             }
 
@@ -57,16 +64,23 @@ public class DiscoJdbcImpl extends CatalogoJdbcImpl<Disco> {
 
     @Override
     public boolean guardar(Disco d) {
-        String sql = "INSERT INTO TBL_DISCO (nombre, idArtista, idDisquera, idGeneroMusical) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO TBL_DISCO (nombre, precio, existencia, descuento, fechaLanzamiento, imagen, idArtista, idDisquera, idGeneroMusical) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
             if (!openConnection()) return false;
 
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, d.getNombre());
-            ps.setInt(2, d.getIdArtista());
-            ps.setInt(3, d.getIdDisquera());
-            ps.setInt(4, d.getIdGeneroMusical());
+            ps.setDouble(2, d.getPrecio());
+
+            ps.setInt(3, d.getExistencia());
+            ps.setDouble(4, d.getDescuento());
+            ps.setString(5, d.getFechaLanzamiento());
+            ps.setString(6, d.getImagen());
+
+            ps.setInt(7, d.getArtista().getId());
+            ps.setInt(8, d.getDisquera().getId());
+            ps.setInt(9, d.getGeneroMusical().getId());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
@@ -98,9 +112,9 @@ public class DiscoJdbcImpl extends CatalogoJdbcImpl<Disco> {
 
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, d.getNombre());
-            ps.setInt(2, d.getIdArtista());
-            ps.setInt(3, d.getIdDisquera());
-            ps.setInt(4, d.getIdGeneroMusical());
+            ps.setInt(2, d.getArtista().getId());
+            ps.setInt(3, d.getDisquera().getId());
+            ps.setInt(4, d.getGeneroMusical().getId());
             ps.setInt(5, d.getId());
 
             int affectedRows = ps.executeUpdate();
@@ -137,5 +151,44 @@ public class DiscoJdbcImpl extends CatalogoJdbcImpl<Disco> {
         }
 
         return false;
+    }
+
+    @Override
+    public ClaseCatalogo findById(int id) {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        Disco disco = null;
+        String sql = "Select * from TBL_DISCO WHERE id = %d";
+
+
+        try {
+            if ( !openConnection() ) {
+                return null;
+            }
+            sql = String.format(sql, id);
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            if ( resultSet == null ) {
+                return null;
+            }
+            while (resultSet.next()) {
+                disco = new Disco();
+                disco.setId(resultSet.getInt("id"));
+                disco.setNombre(resultSet.getString("nombre"));
+                disco.setPrecio(resultSet.getDouble("precio"));
+                disco.setDescuento(resultSet.getDouble("descuento"));
+                disco.setExistencia(resultSet.getInt("existencia"));
+                disco.setFechaLanzamiento(resultSet.getString("fechaLanzamiento"));
+                disco.setImagen(resultSet.getString("imagen"));
+                disco.setDisquera(resultSet.getInt("idArtista"));
+                disco.setArtista(resultSet.getInt("idDisquera"));
+                disco.setGeneroMusical(resultSet.getInt("idGeneroMusical"));
+            }
+            resultSet.close();
+            closeConnection();
+            return disco;
+        } catch (SQLException e) {
+            return null;
+        }
     }
 }

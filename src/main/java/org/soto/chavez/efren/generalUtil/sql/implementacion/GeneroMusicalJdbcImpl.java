@@ -1,5 +1,7 @@
 package org.soto.chavez.efren.generalUtil.sql.implementacion;
 
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
+import org.soto.chavez.efren.model.catalogos.agregarDisco.Disquera;
 import org.soto.chavez.efren.model.catalogos.agregarDisco.GeneroMusical;
 
 import java.sql.PreparedStatement;
@@ -24,7 +26,7 @@ public class GeneroMusicalJdbcImpl extends CatalogoJdbcImpl<GeneroMusical> {
     @Override
     public ArrayList<GeneroMusical> findAll() {
         ArrayList<GeneroMusical> list = new ArrayList<>();
-        String sql = "SELECT * FROM TBL_GENERO_MUSICAL";
+        String sql = "SELECT * FROM TBL_GENEROMUSICAL";
 
         try {
             if (!openConnection()) return null;
@@ -52,7 +54,7 @@ public class GeneroMusicalJdbcImpl extends CatalogoJdbcImpl<GeneroMusical> {
 
     @Override
     public boolean guardar(GeneroMusical g) {
-        String sql = "INSERT INTO TBL_GENERO_MUSICAL (nombre) VALUES (?)";
+        String sql = "INSERT INTO TBL_GENEROMUSICAL (nombre) VALUES (?)";
 
         try {
             if (!openConnection()) return false;
@@ -83,7 +85,7 @@ public class GeneroMusicalJdbcImpl extends CatalogoJdbcImpl<GeneroMusical> {
 
     @Override
     public boolean actualizar(GeneroMusical g) {
-        String sql = "UPDATE TBL_GENERO_MUSICAL SET nombre = ? WHERE id = ?";
+        String sql = "UPDATE TBL_GENEROMUSICAL SET nombre = ? WHERE id = ?";
 
         try {
             if (!openConnection()) return false;
@@ -107,7 +109,7 @@ public class GeneroMusicalJdbcImpl extends CatalogoJdbcImpl<GeneroMusical> {
 
     @Override
     public boolean eliminar(int id) {
-        String sql = "DELETE FROM TBL_GENERO_MUSICAL WHERE id = ?";
+        String sql = "DELETE FROM TBL_GENEROMUSICAL WHERE id = ?";
 
         try {
             if (!openConnection()) return false;
@@ -126,5 +128,36 @@ public class GeneroMusicalJdbcImpl extends CatalogoJdbcImpl<GeneroMusical> {
         }
 
         return false;
+    }
+
+    @Override
+    public ClaseCatalogo findById(int id) {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        GeneroMusical generoMusical = null;
+        String sql = "Select * from TBL_GENEROMUSICAL WHERE id = %d";
+
+
+        try {
+            if ( !openConnection() ) {
+                return null;
+            }
+            sql = String.format(sql, id);
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            if ( resultSet == null ) {
+                return null;
+            }
+            while (resultSet.next()) {
+                generoMusical = new GeneroMusical();
+                generoMusical.setId(resultSet.getInt("id"));
+                generoMusical.setNombre(resultSet.getString("nombre"));
+            }
+            resultSet.close();
+            closeConnection();
+            return generoMusical;
+        } catch (SQLException e) {
+            return null;
+        }
     }
 }

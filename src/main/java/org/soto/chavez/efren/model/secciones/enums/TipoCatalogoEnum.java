@@ -10,7 +10,7 @@ import org.soto.chavez.efren.model.catalogos.registrarUsuario.Colonia;
 import org.soto.chavez.efren.model.catalogos.registrarUsuario.Estado;
 import org.soto.chavez.efren.model.catalogos.registrarUsuario.Municipio;
 
-public enum OperacionesCatalogosEnum {
+public enum TipoCatalogoEnum {
     ESTADO(1, Estado.getManage()),
     MUNICIPIO(2, Municipio.getManage()),
     COLONIA(3, Colonia.getManage()),
@@ -25,7 +25,7 @@ public enum OperacionesCatalogosEnum {
     private final int tipo;
     private final ClaseCatalogo claseCatalogo;
 
-    OperacionesCatalogosEnum(int tipo, ClaseCatalogo claseCatalogo) {
+    TipoCatalogoEnum(int tipo, ClaseCatalogo claseCatalogo) {
         this.tipo = tipo;
         this.claseCatalogo = claseCatalogo;
     }
@@ -35,10 +35,10 @@ public enum OperacionesCatalogosEnum {
     public ClaseCatalogo getCatalogo() {
         return claseCatalogo;
     }
-    public static OperacionesCatalogosEnum getCatalogoByTipo(int tipo) {
-        for (OperacionesCatalogosEnum operacionesCatalogosEnum : values()) {
-            if (operacionesCatalogosEnum.tipo == tipo) {
-                return operacionesCatalogosEnum;
+    public static TipoCatalogoEnum getCatalogoByTipo(int tipo) {
+        for (TipoCatalogoEnum tipoCatalogoEnum : values()) {
+            if (tipoCatalogoEnum.tipo == tipo) {
+                return tipoCatalogoEnum;
             }
         }
         return OPCION_ERRONEA;

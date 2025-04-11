@@ -1,6 +1,7 @@
 package org.soto.chavez.efren.generalUtil.sql.implementacion;
 
 
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 import org.soto.chavez.efren.model.catalogos.agregarDisco.Artista;
 
 import java.sql.PreparedStatement;
@@ -8,12 +9,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ArtistaJdbcImpl extends CatalogoJdbcImpl<Artista> {
     private static ArtistaJdbcImpl instance;
 
-    private ArtistaJdbcImpl() {}
+    private ArtistaJdbcImpl() {
+    }
 
     public static ArtistaJdbcImpl getInstance() {
         if (instance == null) {
@@ -129,5 +130,36 @@ public class ArtistaJdbcImpl extends CatalogoJdbcImpl<Artista> {
         }
 
         return false;
+    }
+
+    @Override
+    public ClaseCatalogo findById(int id) {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        Artista artista = null;
+        String sql = "Select * from TBL_ARTISTA WHERE id = %d";
+
+
+        try {
+            if ( !openConnection() ) {
+                return null;
+            }
+            sql = String.format(sql, id);
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            if ( resultSet == null ) {
+                return null;
+            }
+            while (resultSet.next()) {
+                artista = new Artista();
+                artista.setId(resultSet.getInt("id"));
+                artista.setNombre(resultSet.getString("nombre"));
+            }
+            resultSet.close();
+            closeConnection();
+            return artista;
+        } catch (SQLException e) {
+            return null;
+        }
     }
 }

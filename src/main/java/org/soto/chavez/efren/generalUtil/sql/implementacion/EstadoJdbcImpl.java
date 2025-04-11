@@ -1,8 +1,7 @@
 package org.soto.chavez.efren.generalUtil.sql.implementacion;
 
 
-
-
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 import org.soto.chavez.efren.model.catalogos.registrarUsuario.Estado;
 
 import java.sql.PreparedStatement;
@@ -10,12 +9,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 
 public class EstadoJdbcImpl extends CatalogoJdbcImpl<Estado> {
     private static EstadoJdbcImpl instance;
 
-    private EstadoJdbcImpl() {}
+    private EstadoJdbcImpl() {
+    }
 
     public static EstadoJdbcImpl getInstance() {
         if (instance == null) {
@@ -37,6 +36,10 @@ public class EstadoJdbcImpl extends CatalogoJdbcImpl<Estado> {
 
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
+
+            if ( rs == null ) {
+                return null;
+            }
 
             while (rs.next()) {
                 Estado e = new Estado();
@@ -89,7 +92,7 @@ public class EstadoJdbcImpl extends CatalogoJdbcImpl<Estado> {
 
     @Override
     public boolean actualizar(Estado e) {
-        String sql = "UPDATE TBL_ESTADO SET ESTADO = ? WHERE ID = ?";
+        String sql = "UPDATE TBL_ESTADO SET nombre = ? WHERE ID = ?";
 
         try {
             if (!openConnection()) return false;
@@ -113,7 +116,7 @@ public class EstadoJdbcImpl extends CatalogoJdbcImpl<Estado> {
 
     @Override
     public boolean eliminar(int id) {
-        String sql = "DELETE FROM TBL_ESTADO WHERE ID = ?";
+        String sql = "DELETE FROM TBL_ESTADO WHERE id = ?";
 
         try {
             if (!openConnection()) return false;
@@ -132,6 +135,37 @@ public class EstadoJdbcImpl extends CatalogoJdbcImpl<Estado> {
         }
 
         return false;
+    }
+
+    @Override
+    public ClaseCatalogo findById(int id) {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        Estado estado = null;
+        String sql = "Select * from TBL_ESTADO WHERE id = %d";
+
+
+        try {
+            if ( !openConnection() ) {
+                return null;
+            }
+            sql = String.format(sql, id);
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            if ( resultSet == null ) {
+                return null;
+            }
+            while (resultSet.next()) {
+                estado = new Estado();
+                estado.setId(resultSet.getInt("id"));
+                estado.setNombre(resultSet.getString("nombre"));
+            }
+            resultSet.close();
+            closeConnection();
+            return estado;
+        } catch (SQLException e) {
+            return null;
+        }
     }
 
 }

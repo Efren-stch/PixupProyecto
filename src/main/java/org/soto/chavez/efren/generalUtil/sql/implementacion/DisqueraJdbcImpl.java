@@ -1,6 +1,8 @@
 package org.soto.chavez.efren.generalUtil.sql.implementacion;
 
 
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
+import org.soto.chavez.efren.model.catalogos.agregarDisco.Artista;
 import org.soto.chavez.efren.model.catalogos.agregarDisco.Disquera;
 
 import java.sql.PreparedStatement;
@@ -127,5 +129,36 @@ public class DisqueraJdbcImpl extends CatalogoJdbcImpl<Disquera> {
         }
 
         return false;
+    }
+
+    @Override
+    public ClaseCatalogo findById(int id) {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        Disquera disquera = null;
+        String sql = "Select * from TBL_DISQUERA WHERE id = %d";
+
+
+        try {
+            if ( !openConnection() ) {
+                return null;
+            }
+            sql = String.format(sql, id);
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            if ( resultSet == null ) {
+                return null;
+            }
+            while (resultSet.next()) {
+                disquera = new Disquera();
+                disquera.setId(resultSet.getInt("id"));
+                disquera.setNombre(resultSet.getString("nombre"));
+            }
+            resultSet.close();
+            closeConnection();
+            return disquera;
+        } catch (SQLException e) {
+            return null;
+        }
     }
 }

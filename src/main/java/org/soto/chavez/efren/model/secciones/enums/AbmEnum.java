@@ -5,12 +5,14 @@ public enum AbmEnum {
     BAJA(2),
     VISTA(3),
     MODIFICACION(4),
+    /*
     GUARDAR_ARCHIVO(5),
     LEER_ARCHIVO(6),
     GUARDAR_BD(7),
     LEER_BD(8),
-    SALIR(9),
-    OPCION_ERRONEA(10);
+    */
+    SALIR(5),
+    OPCION_ERRONEA(6);
 
     private Integer tipo;
 
@@ -32,11 +34,13 @@ public enum AbmEnum {
             case 2 -> BAJA;
             case 3 -> VISTA;
             case 4 -> MODIFICACION;
+            /*
             case 5 -> GUARDAR_ARCHIVO;
             case 6 -> LEER_ARCHIVO;
             case 7 -> GUARDAR_BD;
             case 8 -> LEER_BD;
-            case 9 -> SALIR;
+             */
+            case 5 -> SALIR;
             default -> OPCION_ERRONEA;
         };
     }

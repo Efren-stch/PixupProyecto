@@ -22,16 +22,8 @@ public enum TipoEjecutableEnum {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public Ejecutable getEjecutable() {
         return ejecutable;
-    }
-
-    public void setEjecutable(Ejecutable ejecutable) {
-        this.ejecutable = ejecutable;
     }
 
     public static TipoEjecutableEnum getTipoEjecutableById (Integer opcion ) {
@@ -46,11 +38,6 @@ public enum TipoEjecutableEnum {
                 return OPCION_ERRONEA;
 
         }
-        /*return switch ( opcion ) {
-            case 1 -> CONSOLA;
-            case 2 -> VENTANA;
-            case 3 -> SALIR;
-            default -> OPCION_ERRONEA;
-        };*/
     }
+
 }

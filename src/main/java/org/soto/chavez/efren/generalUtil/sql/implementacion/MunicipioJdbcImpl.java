@@ -1,6 +1,8 @@
 package org.soto.chavez.efren.generalUtil.sql.implementacion;
 
 
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
+import org.soto.chavez.efren.model.catalogos.registrarUsuario.Estado;
 import org.soto.chavez.efren.model.catalogos.registrarUsuario.Municipio;
 
 import java.sql.PreparedStatement;
@@ -40,7 +42,7 @@ public class MunicipioJdbcImpl extends CatalogoJdbcImpl<Municipio> {
                 Municipio m = new Municipio();
                 m.setId(rs.getInt("id"));
                 m.setNombre(rs.getString("nombre"));
-                m.setIdEstado(rs.getInt("idEstado")); // Relación con Estado
+                m.setEstado(rs.getInt("idEstado")); // Relación con Estado
                 list.add(m);
             }
 
@@ -63,7 +65,7 @@ public class MunicipioJdbcImpl extends CatalogoJdbcImpl<Municipio> {
 
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, m.getNombre());
-            ps.setInt(2, m.getIdEstado()); // Relación con Estado
+            ps.setInt(2, m.getEstado().getId()); // Relación con Estado
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
@@ -95,7 +97,7 @@ public class MunicipioJdbcImpl extends CatalogoJdbcImpl<Municipio> {
 
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, m.getNombre());
-            ps.setInt(2, m.getIdEstado()); // Relación con Estado
+            ps.setInt(2, m.getEstado().getId()); // Relación con Estado
             ps.setInt(3, m.getId());
 
             int affectedRows = ps.executeUpdate();
@@ -132,5 +134,37 @@ public class MunicipioJdbcImpl extends CatalogoJdbcImpl<Municipio> {
         }
 
         return false;
+    }
+
+    @Override
+    public ClaseCatalogo findById(int id) {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        Municipio municipio = null;
+        String sql = "Select * from TBL_MUNICIPIO WHERE id = %d";
+
+
+        try {
+            if ( !openConnection() ) {
+                return null;
+            }
+            sql = String.format(sql, id);
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            if ( resultSet == null ) {
+                return null;
+            }
+            while (resultSet.next()) {
+                municipio = new Municipio();
+                municipio.setId(resultSet.getInt("id"));
+                municipio.setNombre(resultSet.getString("nombre"));
+                municipio.setEstado(resultSet.getInt("idEstado"));
+            }
+            resultSet.close();
+            closeConnection();
+            return municipio;
+        } catch (SQLException e) {
+            return null;
+        }
     }
 }

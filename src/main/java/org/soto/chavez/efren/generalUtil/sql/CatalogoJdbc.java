@@ -10,4 +10,5 @@ public interface CatalogoJdbc<T extends ClaseCatalogo> {
     boolean guardar(T t);
     boolean actualizar(T t);
     boolean eliminar(int id);
+    ClaseCatalogo findById(int id);
 }

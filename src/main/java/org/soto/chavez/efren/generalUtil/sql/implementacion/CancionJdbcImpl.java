@@ -1,6 +1,8 @@
 package org.soto.chavez.efren.generalUtil.sql.implementacion;
 
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 import org.soto.chavez.efren.model.catalogos.agregarDisco.Cancion;
+import org.soto.chavez.efren.model.catalogos.agregarDisco.GeneroMusical;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,8 +38,8 @@ public class CancionJdbcImpl extends CatalogoJdbcImpl<Cancion> {
                 Cancion c = new Cancion();
                 c.setId(rs.getInt("id"));
                 c.setNombre(rs.getString("nombre"));
-                c.setDuracion(rs.getString("duracion"));
-                c.setIdDisco(rs.getInt("idDisco"));
+                c.setDuracion(rs.getDouble("duracion"));
+                c.setDisco(rs.getInt("idDisco"));
                 list.add(c);
             }
 
@@ -61,8 +63,8 @@ public class CancionJdbcImpl extends CatalogoJdbcImpl<Cancion> {
 
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, c.getNombre());
-            ps.setString(2, c.getDuracion());
-            ps.setInt(3, c.getIdDisco());
+            ps.setDouble(2, c.getDuracion());
+            ps.setInt(3, c.getDisco().getId());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
@@ -94,8 +96,8 @@ public class CancionJdbcImpl extends CatalogoJdbcImpl<Cancion> {
 
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, c.getNombre());
-            ps.setString(2, c.getDuracion());
-            ps.setInt(3, c.getIdDisco());
+            ps.setDouble(2, c.getDuracion());
+            ps.setInt(3, c.getDisco().getId());
             ps.setInt(4, c.getId());
 
             int affectedRows = ps.executeUpdate();
@@ -132,5 +134,38 @@ public class CancionJdbcImpl extends CatalogoJdbcImpl<Cancion> {
         }
 
         return false;
+    }
+
+    @Override
+    public ClaseCatalogo findById(int id) {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        Cancion cancion = null;
+        String sql = "Select * from TBL_CANCION WHERE id = %d";
+
+
+        try {
+            if ( !openConnection() ) {
+                return null;
+            }
+            sql = String.format(sql, id);
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            if ( resultSet == null ) {
+                return null;
+            }
+            while (resultSet.next()) {
+                cancion = new Cancion();
+                cancion.setId(resultSet.getInt("id"));
+                cancion.setNombre(resultSet.getString("nombre"));
+                cancion.setDuracion(resultSet.getInt("duracion"));
+                cancion.setDisco(resultSet.getInt("idDisco"));
+            }
+            resultSet.close();
+            closeConnection();
+            return cancion;
+        } catch (SQLException e) {
+            return null;
+        }
     }
 }

@@ -5,7 +5,7 @@ import org.soto.chavez.efren.generalUtil.Salidas;
 import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 import org.soto.chavez.efren.model.secciones.Ejecutable;
 import org.soto.chavez.efren.model.secciones.enums.AbmEnum;
-import org.soto.chavez.efren.model.secciones.enums.OperacionesCatalogosEnum;
+import org.soto.chavez.efren.model.secciones.enums.TipoCatalogoEnum;
 
 public class SeccionCatalogos implements Ejecutable {
     private static SeccionCatalogos catalogos;
@@ -23,29 +23,29 @@ public class SeccionCatalogos implements Ejecutable {
     @Override
     public void run() {
         int opcion;
-        OperacionesCatalogosEnum operacionesCatalogosEnum;
+        TipoCatalogoEnum tipoCatalogoEnum;
         ClaseCatalogo claseCatalogo;
 
         while (true) {
             System.out.println(Salidas.menuUbicacion);
             opcion = ReadUtil.readInt(Salidas.seleccionarOpcion, 1, 9); // actualizado para cubrir nuevas opciones
 
-            operacionesCatalogosEnum = OperacionesCatalogosEnum.getCatalogoByTipo(opcion);
+            tipoCatalogoEnum = TipoCatalogoEnum.getCatalogoByTipo(opcion);
 
-            if (OperacionesCatalogosEnum.SALIR.equals(operacionesCatalogosEnum)) {
+            if (TipoCatalogoEnum.SALIR.equals(tipoCatalogoEnum)) {
                 return;
-            } else if (OperacionesCatalogosEnum.OPCION_ERRONEA.equals(operacionesCatalogosEnum)) {
+            } else if (TipoCatalogoEnum.OPCION_ERRONEA.equals(tipoCatalogoEnum)) {
                 Salidas.opcionInvalida();
                 continue;
             }
 
-            claseCatalogo = operacionesCatalogosEnum.getCatalogo();
+            claseCatalogo = tipoCatalogoEnum.getCatalogo();
 
             if (claseCatalogo != null) {
                 boolean continuarAbm = true;
                 while (continuarAbm) {
                     System.out.println(Salidas.menuABM);
-                    opcion = ReadUtil.readInt(Salidas.seleccionarOpcion, 1, 9);
+                    opcion = ReadUtil.readInt(Salidas.seleccionarOpcion, 1, 5);
                     AbmEnum abmEnum = AbmEnum.getAbmByTipo(opcion);
 
                     if (AbmEnum.SALIR.equals(abmEnum)) {
@@ -58,10 +58,6 @@ public class SeccionCatalogos implements Ejecutable {
                             case BAJA -> claseCatalogo.baja();
                             case VISTA -> claseCatalogo.vista();
                             case MODIFICACION -> claseCatalogo.modificacion();
-                            case GUARDAR_ARCHIVO -> claseCatalogo.guardarArchivo();
-                            case LEER_ARCHIVO -> claseCatalogo.leerArchivo();
-                            case GUARDAR_BD -> claseCatalogo.guardarBaseDatos();
-                            case LEER_BD -> claseCatalogo.leerBaseDatos();
                         }
                     }
                 }

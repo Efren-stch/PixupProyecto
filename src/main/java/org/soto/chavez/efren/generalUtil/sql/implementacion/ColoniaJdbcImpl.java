@@ -1,14 +1,15 @@
 package org.soto.chavez.efren.generalUtil.sql.implementacion;
 
 
+import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 import org.soto.chavez.efren.model.catalogos.registrarUsuario.Colonia;
+import org.soto.chavez.efren.model.catalogos.registrarUsuario.Municipio;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ColoniaJdbcImpl extends CatalogoJdbcImpl<Colonia> {
     private static ColoniaJdbcImpl instance;
@@ -40,7 +41,8 @@ public class ColoniaJdbcImpl extends CatalogoJdbcImpl<Colonia> {
                 Colonia c = new Colonia();
                 c.setId(rs.getInt("id"));
                 c.setNombre(rs.getString("nombre"));
-                c.setIdMunicipio(rs.getInt("idMunicipio")); // Relación con Municipio
+                c.setCp(rs.getInt("cp"));
+                c.setMunicipio(rs.getInt("idMunicipio")); // Relación con Municipio
                 list.add(c);
             }
 
@@ -56,14 +58,15 @@ public class ColoniaJdbcImpl extends CatalogoJdbcImpl<Colonia> {
 
     @Override
     public boolean guardar(Colonia c) {
-        String sql = "INSERT INTO TBL_COLONIA (nombre, idMunicipio) VALUES (?, ?)";
+        String sql = "INSERT INTO TBL_COLONIA (nombre, cp, idMunicipio) VALUES (?, ?, ?)";
 
         try {
             if (!openConnection()) return false;
 
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, c.getNombre());
-            ps.setInt(2, c.getIdMunicipio()); // Relación con Municipio
+            ps.setInt(2, c.getCp());
+            ps.setInt(3, c.getMunicipio().getId());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
@@ -95,7 +98,7 @@ public class ColoniaJdbcImpl extends CatalogoJdbcImpl<Colonia> {
 
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, c.getNombre());
-            ps.setInt(2, c.getIdMunicipio()); // Relación con Municipio
+            ps.setInt(2, c.getMunicipio().getId()); // Relación con Municipio
             ps.setInt(3, c.getId());
 
             int affectedRows = ps.executeUpdate();
@@ -132,5 +135,38 @@ public class ColoniaJdbcImpl extends CatalogoJdbcImpl<Colonia> {
         }
 
         return false;
+    }
+
+    @Override
+    public ClaseCatalogo findById(int id) {
+        Statement statement = null;
+        ResultSet resultSet = null;
+        Colonia colonia = null;
+        String sql = "Select * from TBL_MUNICIPIO WHERE id = %d";
+
+
+        try {
+            if ( !openConnection() ) {
+                return null;
+            }
+            sql = String.format(sql, id);
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+            if ( resultSet == null ) {
+                return null;
+            }
+            while (resultSet.next()) {
+                colonia = new Colonia();
+                colonia.setId(resultSet.getInt("id"));
+                colonia.setNombre(resultSet.getString("nombre"));
+                colonia.setCp(resultSet.getInt("cp"));
+                colonia.setMunicipio(resultSet.getInt("idMunicipio"));
+            }
+            resultSet.close();
+            closeConnection();
+            return colonia;
+        } catch (SQLException e) {
+            return null;
+        }
     }
 }
