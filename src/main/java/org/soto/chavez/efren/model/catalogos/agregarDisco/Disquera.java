@@ -1,100 +1,85 @@
 package org.soto.chavez.efren.model.catalogos.agregarDisco;
 
-import org.soto.chavez.efren.generalUtil.ManejoArchivos;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.*;
+import org.soto.chavez.efren.BD.dao.implementacion.CatalogoDaoImpl;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.generalUtil.sql.implementacion.ArtistaJdbcImpl;
-import org.soto.chavez.efren.generalUtil.sql.implementacion.DiscoJdbcImpl;
-import org.soto.chavez.efren.generalUtil.sql.implementacion.DisqueraJdbcImpl;
 import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 
-import java.util.ArrayList;
-
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Entity
+@Table( name = "TBL_DISQUERA" )
 public class Disquera extends ClaseCatalogo {
-    private static final long serialVersionUID = 1L;
-    private static final ManejoArchivos<Disquera> manejoArchivos = new ManejoArchivos<>(Disquera.class);
-    private static Integer idIteracion = 0;
-    private static Disquera manage;
-    private Disquera disqueraEncontrada;
+    protected static CatalogoDaoImpl<Disquera> catalogoDaoImpl = new CatalogoDaoImpl<>(Disquera.class);
 
-    public Disquera() {
-        super();
+    private static Disquera manage = null;
+    private Disquera(){
+
     }
-
-    public Disquera(String nombre) {
-        super(++idIteracion, nombre);
-    }
-
-    public static Disquera getManage() {
-        if (manage == null) {
+    public static Disquera getManage(){
+        if(manage == null){
             manage = new Disquera();
         }
         return manage;
     }
 
-    @Override
-    public void alta() {
-        String nombreAlta = ReadUtil.read(Salidas.leerNombre);
-        DisqueraJdbcImpl.getInstance().guardar(new Disquera(nombreAlta));
-    }
 
     @Override
-    public void baja() {
-        realizarBaja(DisqueraJdbcImpl.getInstance());
+    public void alta() {
+        Disquera disquera = new Disquera();
+        disquera.setNombre(ReadUtil.read(Salidas.leerNombre));
+
+        catalogoDaoImpl.guardar(disquera);
+    }
+
+    public boolean alta(String nombre) {
+        Disquera disquera = new Disquera();
+        disquera.setNombre(nombre);
+        catalogoDaoImpl.guardar(disquera);
+        return true;
     }
 
     @Override
     public void modificacion() {
-        disqueraEncontrada = (Disquera) buscarElemento(DisqueraJdbcImpl.getInstance());
-
-        if (disqueraEncontrada != null) {
-            disqueraEncontrada.setNombre(ReadUtil.read(Salidas.nuevoNombre));
-            DisqueraJdbcImpl.getInstance().actualizar(disqueraEncontrada);
+        Disquera disquera = (Disquera) buscarCatalogo(catalogoDaoImpl);
+        if(disquera != null){
+            disquera.setNombre(ReadUtil.read(Salidas.nuevoNombre));
+            catalogoDaoImpl.actualizar(disquera);
         }
     }
 
-    @Override
-    public void vista() {
-        mostrarVista(DisqueraJdbcImpl.getInstance());
-    }
-
-    @Override
-    public String toString() {
-        return "Disquera{" +
-                "nombre='" + nombre + '\'' +
-                ", id=" + id +
-                '}';
-    }
-
-    /*
-    @Override
-    public void leerArchivo() {
-        manejoArchivos.leerArchivo();
-        listDisquera = new ArrayList<>(manejoArchivos.getLista());
-        System.out.println("Estados leídos desde archivo.");
-    }
-
-    @Override
-    public void guardarArchivo() {
-        manejoArchivos.setLista(new ArrayList<>(listDisquera));
-        manejoArchivos.guardarArchivo();
-        System.out.println("Estados guardados en archivo.");
-    }
-
-    @Override
-    public void leerBaseDatos() {
-        listDisquera = DisqueraJdbcImpl.getInstance().findAll();
-    }
-
-    @Override
-    public void guardarBaseDatos() {
-        DisqueraJdbcImpl db = DisqueraJdbcImpl.getInstance();
-        for (Disquera e : listDisquera) {
-            db.guardar(e);
+    public boolean modificacion(Integer id, String nombreNuevo) {
+        Disquera disquera = catalogoDaoImpl.findById(id);
+        if (disquera != null) {
+            disquera.setNombre(nombreNuevo);
+            catalogoDaoImpl.actualizar(disquera);
+            return true;
         }
+        return false;
     }
 
+    @Override
+    public void baja() {
+        realizarBaja(Disquera.class);
+    }
 
+    public boolean baja(Integer id) {
+        Disquera disquera = catalogoDaoImpl.findById(id);
+        if (disquera != null) {
+            catalogoDaoImpl.eliminar(disquera);
+            return true;
+        }
+        return false;
+    }
 
-     */
+    @Override
+    public boolean vista() {
+        System.out.println(realizarVista(catalogoDaoImpl));
+        return true;
+    }
+
 }

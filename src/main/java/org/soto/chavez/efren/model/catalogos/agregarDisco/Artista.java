@@ -1,101 +1,82 @@
 package org.soto.chavez.efren.model.catalogos.agregarDisco;
 
-import org.soto.chavez.efren.generalUtil.ManejoArchivos;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.*;
+import org.soto.chavez.efren.BD.dao.implementacion.CatalogoDaoImpl;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.generalUtil.sql.implementacion.ArtistaJdbcImpl;
-import org.soto.chavez.efren.generalUtil.sql.implementacion.ColoniaJdbcImpl;
-import org.soto.chavez.efren.generalUtil.sql.implementacion.EstadoJdbcImpl;
 import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
-import org.soto.chavez.efren.model.catalogos.registrarUsuario.Colonia;
 
-import java.util.ArrayList;
-
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Entity
+@Table( name = "TBL_ARTISTA" )
 public class Artista extends ClaseCatalogo {
-    private static final long serialVersionUID = 1L;
-    private static final ManejoArchivos<Artista> manejoArchivos = new ManejoArchivos<>(Artista.class);
-    private static Integer idIteracion = 0;
-    private static Artista manage;
-    private Artista artistaEncontrado;
+    protected static CatalogoDaoImpl<Artista> catalogoDaoImpl = new CatalogoDaoImpl<>(Artista.class);
 
-    public Artista() {
-        super();
+    private static Artista manage = null;
+    private Artista(){
+
     }
-
-    public Artista(String nombre) {
-        super(++idIteracion, nombre);
-    }
-
-    public static Artista getManage() {
-        if (manage == null) {
+    public static Artista getManage(){
+        if(manage == null){
             manage = new Artista();
         }
         return manage;
     }
 
-    @Override
-    public void alta() {
-        String nombreAlta = ReadUtil.read(Salidas.leerNombre);
-        ArtistaJdbcImpl.getInstance().guardar(new Artista(nombreAlta));
-    }
 
     @Override
-    public void baja() {
-        realizarBaja(ArtistaJdbcImpl.getInstance());
+    public void alta() {
+        Artista artista = new Artista();
+        artista.setNombre(ReadUtil.read(Salidas.leerNombre));
+
+        catalogoDaoImpl.guardar(artista);
+    }
+    public boolean alta(String nombre){
+        Artista artista = new Artista();
+        artista.setNombre(nombre);
+        catalogoDaoImpl.guardar(artista);
+        return true;
     }
 
     @Override
     public void modificacion() {
-        artistaEncontrado = (Artista) buscarElemento(ArtistaJdbcImpl.getInstance());
-
-        if (artistaEncontrado != null) {
-            artistaEncontrado.setNombre(ReadUtil.read(Salidas.nuevoNombre));
-            ArtistaJdbcImpl.getInstance().actualizar(artistaEncontrado);
+        Artista artista = (Artista) buscarCatalogo(catalogoDaoImpl);
+        if(artista != null){
+            artista.setNombre(ReadUtil.read(Salidas.nuevoNombre));
+            catalogoDaoImpl.actualizar(artista);
         }
     }
-
-    @Override
-    public void vista() {
-        mostrarVista(ArtistaJdbcImpl.getInstance());
-    }
-
-    /*
-
-    @Override
-    public void leerArchivo() {
-        manejoArchivos.leerArchivo();
-        listArtista = new ArrayList<>(manejoArchivos.getLista());
-        System.out.println("Estados leídos desde archivo.");
-    }
-
-    @Override
-    public void guardarArchivo() {
-        manejoArchivos.setLista(new ArrayList<>(listArtista));
-        manejoArchivos.guardarArchivo();
-        System.out.println("Estados guardados en archivo.");
-    }
-
-    @Override
-    public void leerBaseDatos() {
-        listArtista = ArtistaJdbcImpl.getInstance().findAll();
-    }
-
-    @Override
-    public void guardarBaseDatos() {
-        ArtistaJdbcImpl db = ArtistaJdbcImpl.getInstance();
-        for (Artista e : listArtista) {
-            db.guardar(e);
+    public boolean modificacion(Integer id, String nombreNuevo) {
+        Artista artista = catalogoDaoImpl.findById(id);
+        if(artista != null){
+            artista.setNombre(nombreNuevo);
+            catalogoDaoImpl.actualizar(artista);
+            return  true;
         }
+        return false;
     }
-
-     */
-
 
     @Override
-    public String toString() {
-        return "Artista{" +
-                "nombre='" + nombre + '\'' +
-                ", id=" + id +
-                '}';
+    public void baja() {
+        realizarBaja(Artista.class);
     }
+    public boolean baja(Integer id) {
+        Artista artista = catalogoDaoImpl.findById(id);
+        if(artista != null){
+            catalogoDaoImpl.eliminar(artista);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean vista() {
+        System.out.println(realizarVista(catalogoDaoImpl));
+        return false;
+    }
+
 }

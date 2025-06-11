@@ -54,10 +54,26 @@ public class SeccionCatalogos implements Ejecutable {
                         Salidas.opcionInvalida();
                     } else {
                         switch (abmEnum) {
-                            case ALTA -> claseCatalogo.alta();
-                            case BAJA -> claseCatalogo.baja();
-                            case VISTA -> claseCatalogo.vista();
-                            case MODIFICACION -> claseCatalogo.modificacion();
+                            case ALTA -> {
+                                System.out.println("------- ALTA -------");
+                                claseCatalogo.alta();
+                                System.out.println("----------------------------");
+                            }
+                            case BAJA -> {
+                                System.out.println("------- BAJA -------");
+                                claseCatalogo.baja();
+                                System.out.println("----------------------------");
+                            }
+                            case VISTA -> {
+                                System.out.println("------- VISTA -------");
+                                claseCatalogo.vista();
+                                System.out.println("----------------------------");
+                            }
+                            case MODIFICACION -> {
+                                System.out.println("------- MODIFICACIÓN -------");
+                                claseCatalogo.modificacion();
+                                System.out.println("----------------------------");
+                            }
                         }
                     }
                 }

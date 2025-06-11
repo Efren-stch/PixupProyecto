@@ -1,32 +1,27 @@
 package org.soto.chavez.efren.model.catalogos.agregarDisco;
 
-import org.soto.chavez.efren.generalUtil.ManejoArchivos;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.*;
+import org.soto.chavez.efren.BD.dao.implementacion.CatalogoDaoImpl;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.generalUtil.sql.implementacion.GeneroMusicalJdbcImpl;
 import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 
-import java.util.ArrayList;
-
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Entity
+@Table( name = "TBL_GENEROMUSICAL" )
 public class GeneroMusical extends ClaseCatalogo {
-    private static final long serialVersionUID = 1L;
-    private static final ManejoArchivos<GeneroMusical> manejoArchivos = new ManejoArchivos<>(GeneroMusical.class);
-    private static Integer idIteracion = 0;
-    private static GeneroMusical manage;
-    //private String descripcion;
-    private GeneroMusical generoMusicalEncontrado;
+    protected static CatalogoDaoImpl<GeneroMusical> catalogoDaoImpl = new CatalogoDaoImpl<>(GeneroMusical.class);
 
-    public GeneroMusical() {
-        super();
+    private static GeneroMusical manage = null;
+    private GeneroMusical(){
+
     }
-
-    public GeneroMusical(String nombre) {
-        super(++idIteracion, nombre);
-        //this.descripcion = descripcion;
-    }
-
-    public static GeneroMusical getManage() {
-        if (manage == null) {
+    public static GeneroMusical getManage(){
+        if(manage == null){
             manage = new GeneroMusical();
         }
         return manage;
@@ -35,67 +30,56 @@ public class GeneroMusical extends ClaseCatalogo {
 
     @Override
     public void alta() {
-        String nombreAlta = ReadUtil.read(Salidas.leerNombre);
-        GeneroMusicalJdbcImpl.getInstance().guardar(new GeneroMusical(nombreAlta));
+        GeneroMusical generoMusical = new GeneroMusical();
+        generoMusical.setNombre(ReadUtil.read(Salidas.leerNombre));
+
+        catalogoDaoImpl.guardar(generoMusical);
     }
 
-    @Override
-    public void baja() {
-        realizarBaja(GeneroMusicalJdbcImpl.getInstance());
+    public boolean alta(String nombre) {
+        GeneroMusical generoMusical = new GeneroMusical();
+        generoMusical.setNombre(nombre);
+        catalogoDaoImpl.guardar(generoMusical);
+        return true;
     }
 
     @Override
     public void modificacion() {
-        generoMusicalEncontrado = (GeneroMusical) buscarElemento(GeneroMusicalJdbcImpl.getInstance());
-
-        if (generoMusicalEncontrado != null) {
-            generoMusicalEncontrado.setNombre(ReadUtil.read(Salidas.nuevoNombre));
-            GeneroMusicalJdbcImpl.getInstance().actualizar(generoMusicalEncontrado);
+        GeneroMusical generoMusical = (GeneroMusical) buscarCatalogo(catalogoDaoImpl);
+        if(generoMusical != null){
+            generoMusical.setNombre(ReadUtil.read(Salidas.nuevoNombre));
+            catalogoDaoImpl.actualizar(generoMusical);
         }
     }
 
-    @Override
-    public void vista() {
-        mostrarVista(GeneroMusicalJdbcImpl.getInstance());
-    }
-
-    @Override
-    public String toString() {
-        return "GeneroMusical{" +
-                "nombre='" + nombre + '\'' +
-                ", id=" + id +
-                '}';
-    }
-
-    /*
-    @Override
-    public void leerArchivo() {
-        manejoArchivos.leerArchivo();
-        listGeneroMusical = new ArrayList<>(manejoArchivos.getLista());
-        System.out.println("Estados leídos desde archivo.");
-    }
-
-    @Override
-    public void guardarArchivo() {
-        manejoArchivos.setLista(new ArrayList<>(listGeneroMusical));
-        manejoArchivos.guardarArchivo();
-        System.out.println("Estados guardados en archivo.");
-    }
-
-    @Override
-    public void leerBaseDatos() {
-        listGeneroMusical = GeneroMusicalJdbcImpl.getInstance().findAll();
-    }
-
-    @Override
-    public void guardarBaseDatos() {
-        GeneroMusicalJdbcImpl db = GeneroMusicalJdbcImpl.getInstance();
-        for (GeneroMusical e : listGeneroMusical) {
-            db.guardar(e);
+    public boolean modificacion(Integer id, String nombreNuevo) {
+        GeneroMusical generoMusical = catalogoDaoImpl.findById(id);
+        if (generoMusical != null) {
+            generoMusical.setNombre(nombreNuevo);
+            catalogoDaoImpl.actualizar(generoMusical);
+            return true;
         }
+        return false;
     }
 
+    @Override
+    public void baja() {
+        realizarBaja(GeneroMusical.class);
+    }
 
+    public boolean baja(Integer id) {
+        GeneroMusical generoMusical = catalogoDaoImpl.findById(id);
+        if (generoMusical != null) {
+            catalogoDaoImpl.eliminar(generoMusical);
+            return true;
+        }
+        return false;
+    }
 
-     */
+    @Override
+    public boolean vista() {
+        System.out.println(realizarVista(catalogoDaoImpl));
+        return true;
+    }
+
 }

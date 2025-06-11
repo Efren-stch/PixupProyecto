@@ -127,7 +127,7 @@ SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `pixup`.`TBL_DISCO` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(45) NOT NULL,
-  `precio` DOUBLE(4,2) NOT NULL,
+  `precio` DOUBLE NOT NULL DEFAULT 450.5,
   `existencia` INT NOT NULL,
   `descuento` DOUBLE(2,2) NOT NULL,
   `fechaLanzamiento` VARCHAR(45) NOT NULL,

@@ -1,43 +1,43 @@
 package org.soto.chavez.efren.model.catalogos.agregarDisco;
 
-import org.soto.chavez.efren.generalUtil.ManejoArchivos;
+import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+import org.soto.chavez.efren.BD.dao.implementacion.CatalogoDaoImpl;
 import org.soto.chavez.efren.generalUtil.ReadUtil;
 import org.soto.chavez.efren.generalUtil.Salidas;
-import org.soto.chavez.efren.generalUtil.sql.implementacion.*;
 import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@Entity
+@Table(name = "TBL_DISCO")
 public class Disco extends ClaseCatalogo {
-    private static final long serialVersionUID = 1L;
-    private static final ManejoArchivos<Disco> manejoArchivos = new ManejoArchivos<>(Disco.class);
-    private static Integer idIteracion = 0;
-    private static Disco manage;
 
-    private double precio;
-    private int existencia;
-    private double descuento;
+    @Column(name = "precio")
+    private Double precio;
+    @Column(name = "existencia")
+    private Integer existencia;
+    @Column(name = "descuento")
+    private Double descuento;
+    @Column(name = "fechaLanzamiento")
     private String fechaLanzamiento;
+    @Column(name = "imagen")
     private String imagen;
-    private Disquera disquera;
-    private Artista artista;
-    private GeneroMusical generoMusical;
-    private Disco discoEncontrada;
+    @Column(name = "idArtista")
+    private Integer idArtista;
+    @Column(name = "idDisquera")
+    private Integer idDisquera;
+    @Column(name = "idGeneroMusical")
+    private Integer idGeneroMusical;
 
-
-    public Disco() {
-        super();
-    }
-
-    public Disco(String nombre, double precio, int existencia, double descuento, String fechaLanzamiento, String imagen, Disquera disquera, Artista artista, GeneroMusical generoMusical) {
-        super(++idIteracion, nombre);
-        this.precio = precio;
-        this.existencia = existencia;
-        this.descuento = descuento;
-        this.fechaLanzamiento = fechaLanzamiento;
-        this.imagen = imagen;
-        this.disquera = disquera;
-        this.artista = artista;
-        this.generoMusical = generoMusical;
-    }
+    protected static CatalogoDaoImpl<Disco> catalogoDaoImpl = new CatalogoDaoImpl<>(Disco.class);
+    private static Disco manage = null;
 
     public static Disco getManage() {
         if (manage == null) {
@@ -46,176 +46,120 @@ public class Disco extends ClaseCatalogo {
         return manage;
     }
 
-
-    public double getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(double precio) {
-        this.precio = precio;
-    }
-
-    public int getExistencia() {
-        return existencia;
-    }
-
-    public void setExistencia(int existencia) {
-        this.existencia = existencia;
-    }
-
-    public double getDescuento() {
-        return descuento;
-    }
-
-    public void setDescuento(double descuento) {
-        this.descuento = descuento;
-    }
-
-    public String getFechaLanzamiento() {
-        return fechaLanzamiento;
-    }
-
-    public void setFechaLanzamiento(String fechaLanzamiento) {
-        this.fechaLanzamiento = fechaLanzamiento;
-    }
-
-    public String getImagen() {
-        return imagen;
-    }
-
-    public void setImagen(String imagen) {
-        this.imagen = imagen;
-    }
-
-    public Disquera getDisquera() {
-        return disquera;
-    }
-
-    public void setDisquera(int id) {
-        this.disquera = (Disquera) buscarElemento(DisqueraJdbcImpl.getInstance(), id);
-    }
-
-    public Artista getArtista() {
-        return artista;
-    }
-
-    public void setArtista(int id) {
-        this.artista = (Artista) buscarElemento(ArtistaJdbcImpl.getInstance(), id);
-    }
-
-    public GeneroMusical getGeneroMusical() {
-        return generoMusical;
-    }
-
-    public void setGeneroMusical(int id) {
-        this.generoMusical = (GeneroMusical) buscarElemento(GeneroMusicalJdbcImpl.getInstance(), id);
-    }
-
     @Override
     public void alta() {
-        if (estaVacia(DisqueraJdbcImpl.getInstance()) ||
-            estaVacia(ArtistaJdbcImpl.getInstance()) ||
-            estaVacia(GeneroMusicalJdbcImpl.getInstance())
-        ) {
-            System.out.println("No hay disqueras, artistas o generos registrados para poder proceder");
-            return;
-        }
+        Disco disco = new Disco();
+        disco.setNombre(ReadUtil.read(Salidas.leerNombre));
+        disco.setPrecio(Double.valueOf(ReadUtil.read("Precio:")));
+        disco.setExistencia(Integer.valueOf(ReadUtil.read("Existencia:")));
+        disco.setDescuento(Double.valueOf(ReadUtil.read("Descuento (%):")));
+        disco.setFechaLanzamiento(ReadUtil.read("Fecha de lanzamiento (dd/mm/aaaa):"));
+        disco.setImagen(ReadUtil.read("Ruta de la imagen:"));
 
-        String nombreAlta = ReadUtil.read(Salidas.leerNombre);
-        double precioAlta = ReadUtil.readDouble("Digita el precio: ");
-        int existenciaAlta = ReadUtil.readInt("Digita el número de existencias: ");
-        double descuentoAlta = ReadUtil.readDouble("Digita el descuentoAlta: ");
-        String fechaLanzamientoAlta = ReadUtil.read("Digita la fecha de lanzamiento: ");
-        String imagenAlta = ReadUtil.read("Digita la imagenAlta: ");
+        // Buscar Artista, Disquera y Género Musical
+        Artista artista = (Artista) buscarCatalogo(Artista.catalogoDaoImpl);
+        if (artista != null) disco.setIdArtista(artista.getId());
 
-        System.out.println("Selecciona el id de la disquera a la que pertenece: ");
-        Disquera disqueraLigada = (Disquera) buscarElemento(DisqueraJdbcImpl.getInstance());
-        System.out.println("Selecciona el id del Artista al que pertenece: ");
-        Artista artistaLigada = (Artista) buscarElemento(ArtistaJdbcImpl.getInstance());
-        System.out.println("Selecciona el id del género musical al que pertenece: ");
-        GeneroMusical generoMusicalLigado = (GeneroMusical) buscarElemento(GeneroMusicalJdbcImpl.getInstance());
+        Disquera disquera = (Disquera) buscarCatalogo(Disquera.catalogoDaoImpl);
+        if (disquera != null) disco.setIdDisquera(disquera.getId());
 
-        DiscoJdbcImpl.getInstance().guardar(new Disco(nombreAlta, precioAlta, existenciaAlta, descuentoAlta, fechaLanzamientoAlta, imagenAlta, disqueraLigada, artistaLigada, generoMusicalLigado));
+        GeneroMusical genero = (GeneroMusical) buscarCatalogo(GeneroMusical.catalogoDaoImpl);
+        if (genero != null) disco.setIdGeneroMusical(genero.getId());
+
+        catalogoDaoImpl.guardar(disco);
     }
 
-    @Override
-    public void baja() {
-        realizarBaja(DiscoJdbcImpl.getInstance());
+    public boolean alta(String nombre, Double precio, Integer existencia, Double descuento, String fechaLanzamiento, String imagen, Integer idArtista, Integer idDisquera, Integer idGeneroMusical) {
+        Disco disco = new Disco();
+        disco.setNombre(nombre);
+        disco.setPrecio(precio);
+        disco.setExistencia(existencia);
+        disco.setDescuento(descuento);
+        disco.setFechaLanzamiento(fechaLanzamiento);
+        disco.setImagen(imagen);
+        disco.setIdArtista(idArtista);
+        disco.setIdDisquera(idDisquera);
+        disco.setIdGeneroMusical(idGeneroMusical);
+        catalogoDaoImpl.guardar(disco);
+        return true;
     }
 
     @Override
     public void modificacion() {
-        discoEncontrada = (Disco) buscarElemento(DiscoJdbcImpl.getInstance());
+        Disco disco = (Disco) buscarCatalogo(catalogoDaoImpl);
+        if (disco != null) {
+            disco.setNombre(ReadUtil.read(Salidas.nuevoNombre));
+            disco.setPrecio(Double.valueOf(ReadUtil.read("Nuevo precio:")));
+            disco.setExistencia(Integer.valueOf(ReadUtil.read("Nueva existencia:")));
+            disco.setDescuento(Double.valueOf(ReadUtil.read("Nuevo descuento (%):")));
+            disco.setFechaLanzamiento(ReadUtil.read("Nueva fecha de lanzamiento (dd/mm/aaaa):"));
+            disco.setImagen(ReadUtil.read("Nueva ruta de la imagen:"));
 
-        if (discoEncontrada != null) {
-            discoEncontrada.setNombre(ReadUtil.read(Salidas.nuevoNombre));
-            discoEncontrada.setPrecio(ReadUtil.readDouble("Digita el nuevo precio: "));
-            discoEncontrada.setExistencia(ReadUtil.readInt("Digita el nuevo número de existencias: "));
-            discoEncontrada.setDescuento(ReadUtil.readDouble("Digita el nuevo descuento: "));
-            discoEncontrada.setFechaLanzamiento(ReadUtil.read("Digita la nueva fecha de lanzamiento: "));
-            discoEncontrada.setImagen(ReadUtil.read("Digita la nueva imagen: "));
-            System.out.println("Selecciona el id del nuevo Artista al que pertenece: ");
-            discoEncontrada.setArtista( ((Artista)buscarElemento(ArtistaJdbcImpl.getInstance())).getId() );
-            System.out.println("Selecciona el id del nuevo Genero Musical al que pertenece: ");
-            discoEncontrada.setGeneroMusical( ((GeneroMusical)buscarElemento(GeneroMusicalJdbcImpl.getInstance())).getId() );
-            System.out.println("Selecciona el id de la nueva Disquera al que pertenece: ");
-            discoEncontrada.setDisquera( ((Disquera)buscarElemento(DisqueraJdbcImpl.getInstance())).getId() );
+            System.out.println("Nuevo Artista:");
+            Artista artista = (Artista) buscarCatalogo(Artista.catalogoDaoImpl);
+            if (artista != null) disco.setIdArtista(artista.getId());
 
-            DiscoJdbcImpl.getInstance().actualizar(discoEncontrada);
+            System.out.println("Nueva Disquera:");
+            Disquera disquera = (Disquera) buscarCatalogo(Disquera.catalogoDaoImpl);
+            if (disquera != null) disco.setIdDisquera(disquera.getId());
+
+            System.out.println("Nuevo Género Musical:");
+            GeneroMusical genero = (GeneroMusical) buscarCatalogo(GeneroMusical.catalogoDaoImpl);
+            if (genero != null) disco.setIdGeneroMusical(genero.getId());
+
+            catalogoDaoImpl.actualizar(disco);
         }
     }
 
+    public boolean modificacion(Integer id, String nombre, Double precio, Integer existencia, Double descuento, String fechaLanzamiento, String imagen, Integer idArtista, Integer idDisquera, Integer idGeneroMusical) {
+        Disco disco = catalogoDaoImpl.findById(id);
+        if (disco != null) {
+            disco.setNombre(nombre);
+            disco.setPrecio(precio);
+            disco.setExistencia(existencia);
+            disco.setDescuento(descuento);
+            disco.setFechaLanzamiento(fechaLanzamiento);
+            disco.setImagen(imagen);
+            disco.setIdArtista(idArtista);
+            disco.setIdDisquera(idDisquera);
+            disco.setIdGeneroMusical(idGeneroMusical);
+            catalogoDaoImpl.actualizar(disco);
+            return true;
+        }
+        return false;
+    }
 
     @Override
-    public void vista() {
-        mostrarVista(DiscoJdbcImpl.getInstance());
+    public void baja() {
+        realizarBaja(Disco.class);
+    }
+
+    public boolean baja(Integer id) {
+        Disco disco = catalogoDaoImpl.findById(id);
+        if (disco != null) {
+            catalogoDaoImpl.eliminar(disco);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean vista() {
+        System.out.println(realizarVista(catalogoDaoImpl));
+        return true;
     }
 
     @Override
     public String toString() {
         return "Disco{" +
-                "nombre='" + nombre + '\'' +
-                ", id=" + id +
-                ", precio=" + precio +
+                "precio=" + precio +
                 ", existencia=" + existencia +
                 ", descuento=" + descuento +
                 ", fechaLanzamiento='" + fechaLanzamiento + '\'' +
                 ", imagen='" + imagen + '\'' +
-                ", disquera=" + disquera.getNombre() +
-                ", artista=" + artista.getNombre() +
-                ", generoMusical=" + generoMusical.getNombre() +
+                ", Artista=" + Artista.catalogoDaoImpl.findById(idArtista) +
+                ", Disquera=" + Disquera.catalogoDaoImpl.findById(idDisquera)  +
+                ", GeneroMusical=" + GeneroMusical.catalogoDaoImpl.findById(idGeneroMusical) +
                 '}';
     }
-
-    /*
-    @Override
-    public void leerArchivo() {
-        manejoArchivos.leerArchivo();
-        listDisco = new ArrayList<>(manejoArchivos.getLista());
-        System.out.println("Estados leídos desde archivo.");
-    }
-
-    @Override
-    public void guardarArchivo() {
-        manejoArchivos.setLista(new ArrayList<>(listDisco));
-        manejoArchivos.guardarArchivo();
-        System.out.println("Estados guardados en archivo.");
-    }
-
-    @Override
-    public void leerBaseDatos() {
-        listDisco = DiscoJdbcImpl.getInstance().findAll();
-    }
-
-    @Override
-    public void guardarBaseDatos() {
-        DiscoJdbcImpl db = DiscoJdbcImpl.getInstance();
-        for (Disco e : listDisco) {
-            db.guardar(e);
-        }
-    }
-
-
-
-     */
 }

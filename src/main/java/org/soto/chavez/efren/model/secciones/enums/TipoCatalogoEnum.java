@@ -1,5 +1,6 @@
 package org.soto.chavez.efren.model.secciones.enums;
 
+import lombok.Getter;
 import org.soto.chavez.efren.model.catalogos.ClaseCatalogo;
 import org.soto.chavez.efren.model.catalogos.agregarDisco.Artista;
 import org.soto.chavez.efren.model.catalogos.agregarDisco.Cancion;
@@ -22,6 +23,7 @@ public enum TipoCatalogoEnum {
     SALIR(9, null),
     OPCION_ERRONEA(-1, null); 
 
+    @Getter
     private final int tipo;
     private final ClaseCatalogo claseCatalogo;
 
@@ -29,9 +31,7 @@ public enum TipoCatalogoEnum {
         this.tipo = tipo;
         this.claseCatalogo = claseCatalogo;
     }
-    public int getTipo() {
-        return tipo;
-    }
+
     public ClaseCatalogo getCatalogo() {
         return claseCatalogo;
     }
